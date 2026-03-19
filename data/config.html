@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Configuración</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <div class="topnav">
+    <h3>CONFIGURACIÓN</h3>
+  </div>
+  <div class="content">
+    <div class="cards cards-single">
+
+      <!-- Sección WiFi -->
+      <div class="card">
+        <h4>Red WiFi</h4>
+        <form action="/config/wifi" method="POST">
+          <div class="form-group">
+            <label for="ssid">SSID</label>
+            <input type="text" id="ssid" name="ssid" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" required>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Guardar y Reiniciar</button>
+          </div>
+        </form>
+        <div class="form-actions">
+          <a href="/reset/wifi" class="btn-danger">Resetear configuración WiFi</a>
+        </div>
+      </div>
+
+      <!-- Sección MQTT -->
+      <div class="card">
+        <h4>
+          <label class="checkbox-label">
+            <input type="checkbox" id="mqtt_enabled" onchange="toggleMqtt()">
+            Utilizar Broker con Home Assistant
+          </label>
+        </h4>
+
+        <div id="mqtt_section" style="display:none;">
+
+          <div id="mqtt_alert" class="alert" style="display:none;"></div>
+
+          <div id="mqtt_status_bar" class="mqtt-status" style="display:none;">
+            <span id="mqtt_status_dot" class="status-dot"></span>
+            <span id="mqtt_status_text"></span>
+            <button id="mqtt_connect_btn" class="btn-connect" onclick="connectMqtt()" style="display:none;">Conectar</button>
+          </div>
+
+          <div class="form-group">
+            <label for="mqtt_ip">IP Broker</label>
+            <input type="text" id="mqtt_ip" name="mqtt_ip" placeholder="192.168.0.100">
+          </div>
+          <div class="form-group">
+            <label for="mqtt_port">Puerto</label>
+            <input type="number" id="mqtt_port" name="mqtt_port" placeholder="1883">
+          </div>
+          <div class="form-group">
+            <label for="mqtt_user">Usuario</label>
+            <input type="text" id="mqtt_user" name="mqtt_user">
+          </div>
+          <div class="form-group">
+            <label for="mqtt_pass">Contraseña</label>
+            <input type="password" id="mqtt_pass" name="mqtt_pass">
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-primary" onclick="saveMqtt()">Guardar configuración</button>
+          </div>
+          <div class="form-actions">
+            <a href="/reset/mqtt" class="btn-danger">Resetear configuración MQTT</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      fetch('/mqtt/status')
+        .then(r => r.json())
+        .then(data => {
+          if (data.enabled) {
+            document.getElementById('mqtt_enabled').checked = true;
+            document.getElementById('mqtt_ip').value   = data.ip   || '';
+            document.getElementById('mqtt_port').value = data.port || 1883;
+            document.getElementById('mqtt_user').value = data.user || '';
+            toggleMqtt();
+            updateMqttStatus(data.connected);
+          }
+        })
+        .catch(() => {});
+    };
+
+    function toggleMqtt() {
+      const enabled = document.getElementById('mqtt_enabled').checked;
+      document.getElementById('mqtt_section').style.display = enabled ? 'block' : 'none';
+      document.getElementById('mqtt_alert').style.display = 'none';
+    }
+
+    function updateMqttStatus(connected) {
+      const bar  = document.getElementById('mqtt_status_bar');
+      const dot  = document.getElementById('mqtt_status_dot');
+      const text = document.getElementById('mqtt_status_text');
+      const btn  = document.getElementById('mqtt_connect_btn');
+
+      bar.style.display = 'flex';
+      if (connected) {
+        dot.className  = 'status-dot connected';
+        text.textContent = 'Conectado al broker';
+        btn.style.display = 'none';
+      } else {
+        dot.className  = 'status-dot disconnected';
+        text.textContent = 'Sin conexión al broker';
+        btn.style.display = 'inline-block';
+      }
+    }
+
+    function connectMqtt() {
+      const btn = document.getElementById('mqtt_connect_btn');
+      btn.textContent = 'Conectando...';
+      btn.disabled = true;
+
+      fetch('/mqtt/connect')
+        .then(r => r.json())
+        .then(data => {
+          // Esperar 2s y verificar el estado real
+          setTimeout(() => {
+            fetch('/mqtt/status')
+              .then(r => r.json())
+              .then(s => {
+                updateMqttStatus(s.connected);
+                btn.textContent = 'Conectar';
+                btn.disabled = false;
+                if (!s.connected) {
+                  const alert = document.getElementById('mqtt_alert');
+                  alert.textContent = '⚠️ No se pudo conectar al broker. Verificá que esté disponible.';
+                  alert.style.display = 'block';
+                }
+              });
+          }, 2000);
+        })
+        .catch(() => {
+          btn.textContent = 'Conectar';
+          btn.disabled = false;
+        });
+    }
+
+    function saveMqtt() {
+      const ip   = document.getElementById('mqtt_ip').value.trim();
+      const port = document.getElementById('mqtt_port').value.trim() || '1883';
+      const user = document.getElementById('mqtt_user').value.trim();
+      const pass = document.getElementById('mqtt_pass').value.trim();
+      const alertEl = document.getElementById('mqtt_alert');
+
+      if (!ip) {
+        alertEl.textContent = '⚠️ Ingresá la IP del broker.';
+        alertEl.style.display = 'block';
+        return;
+      }
+
+      alertEl.style.display = 'none';
+
+      // Guardar directamente — la verificación real la hace el ESP32 al conectar
+      postMqttConfig(ip, port, user, pass);
+    }
+
+    function postMqttConfig(ip, port, user, pass) {
+      const formData = new FormData();
+      formData.append('mqtt_ip',   ip);
+      formData.append('mqtt_port', port);
+      formData.append('mqtt_user', user);
+      formData.append('mqtt_pass', pass);
+
+      fetch('/config/mqtt', { method: 'POST', body: formData })
+        .then(r => r.text())
+        .then(msg => {
+          document.body.innerHTML = `<div style="padding:40px;text-align:center;font-family:Arial">${msg}</div>`;
+        })
+        .catch(() => {
+          // El ESP32 reinicia y corta la conexión — es normal
+          document.body.innerHTML = `<div style="padding:40px;text-align:center;font-family:Arial">Configuración MQTT guardada. Reiniciando...</div>`;
+        });
+    }
+  </script>
+</body>
+</html>

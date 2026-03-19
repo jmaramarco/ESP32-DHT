@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>ESP32 DHT WebSocket</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <div class="topnav">
+    <h3>ESP32 DHT WEBSOCKET</h3>
+    <p>Estado: %STATUS%</p>
+    <a href="/config" class="config-btn" title="Configuración">
+      <img src="/gear.svg" alt="Configuración" width="22" height="22">
+    </a>
+  </div>
+  <div class="content">
+    <div class="cards">
+      <div class="card temperature">
+        <h4>
+          <img src="/thermometer.svg" alt="Temperatura" width="20" height="20" class="icon">
+          TEMPERATURE
+        </h4>
+        <p><span class="reading"><span id="temp">%TEMPERATURE%</span> &deg;C</span></p>
+      </div>
+      <div class="card humidity">
+        <h4>
+          <img src="/droplet.svg" alt="Humedad" width="20" height="20" class="icon">
+          HUMIDITY
+        </h4>
+        <p><span class="reading"><span id="hum">%HUMIDITY%</span> &percnt;</span></p>
+      </div>
+    </div>
+  </div>
+  <script src="/script.js"></script>
+</body>
+</html>

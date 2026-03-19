@@ -1,0 +1,195 @@
+html {
+  font-family: Arial;
+  display: inline-block;
+  text-align: center;
+}
+p {
+  font-size: 1.2rem;
+}
+body {
+  margin: 0;
+}
+.topnav {
+  overflow: hidden;
+  background-color: #50B8B4;
+  color: white;
+  font-size: 1rem;
+  position: relative;
+}
+.content {
+  padding: 20px;
+}
+.card {
+  background-color: white;
+  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+  padding: 24px;
+}
+.cards {
+  max-width: 700px;
+  margin: 0 auto;
+  display: grid;
+  grid-gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.reading {
+  font-size: 2.8rem;
+}
+.card.temperature {
+  color: #0e7c7b;
+}
+.card.humidity {
+  color: #17bebb;
+}
+.icon {
+  vertical-align: middle;
+}
+.config-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.2s, transform 0.4s;
+}
+.config-btn:hover {
+  opacity: 1;
+  transform: translateY(-50%) rotate(60deg);
+}
+
+/* ─── Formulario ────────────────────────────────────────────────────────────── */
+.form-group {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #ddd;
+  padding: 10px 0;
+  text-align: left;
+}
+.form-group:last-of-type {
+  border-bottom: 1px solid #ddd;
+}
+.form-group label {
+  width: 110px;
+  flex-shrink: 0;
+  font-weight: bold;
+  color: #333;
+  font-size: 0.95rem;
+  padding-right: 12px;
+}
+.form-group input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-group input:focus {
+  border-color: #50B8B4;
+}
+.form-actions {
+  margin-top: 20px;
+  text-align: center;
+}
+.btn-primary {
+  background-color: #50B8B4;
+  color: white;
+  border: none;
+  padding: 10px 0;
+  width: 100%;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.btn-primary:hover {
+  background-color: #3fa09c;
+}
+.btn-danger {
+  color: #e05c5c;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.btn-danger:hover {
+  text-decoration: underline;
+}
+
+/* ─── Checkbox ──────────────────────────────────────────────────────────────── */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #333;
+  font-weight: normal;
+}
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #50B8B4;
+  cursor: pointer;
+}
+
+/* ─── Alert ─────────────────────────────────────────────────────────────────── */
+.alert {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  color: #856404;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+/* ─── MQTT Status Bar ───────────────────────────────────────────────────────── */
+.mqtt-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  color: #333;
+}
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-dot.connected {
+  background-color: #2ecc71;
+}
+.status-dot.disconnected {
+  background-color: #e05c5c;
+}
+.btn-connect {
+  margin-left: auto;
+  background-color: #50B8B4;
+  color: white;
+  border: none;
+  padding: 5px 14px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.btn-connect:hover {
+  background-color: #3fa09c;
+}
+.btn-connect:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── Config página — una columna ──────────────────────────────────────────── */
+.cards-single {
+  grid-template-columns: 1fr;
+  max-width: 500px;
+}
